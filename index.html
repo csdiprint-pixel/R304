@@ -584,7 +584,7 @@
         }
     }
 
-    // 依照「直排橫列」重構：控制動態欄位 1~6 或 7~12
+    // 核心渲染：加入後門水平走道 (第 7 視覺列)
     function renderSeatsGrid() {
         if (!currentBlock && currentPage !== "admin") return;
 
@@ -607,16 +607,18 @@
             stageArea.style.display = "flex";
         }
 
-        const MAX_ROWS = 11; // 總排數維持 11 排
+        // 原本 11 排座位 + 1 排橫向走道 = 總共 12 列的視覺空間
+        const MAX_VISUAL_ROWS = 12; 
 
-        for (let row = 1; row <= MAX_ROWS; row++) {
+        for (let vRow = 1; vRow <= MAX_VISUAL_ROWS; vRow++) {
             html += "<tr>";
             
             // 門僅在顯示左側(含第一欄)或全區時顯示
             if (currentBlock === 'left' || currentBlock === 'all' || isBackend) {
-                if (row === 1) {
+                if (vRow === 1) {
                     html += `<td class="door-cell door-cell-active">前門</td>`;
-                } else if (row === 7) {
+                } else if (vRow === 7) {
+                    // 第 7 列擺放後門
                     html += `<td class="door-cell door-cell-active">後門</td>`;
                 } else {
                     html += `<td class="door-cell"></td>`;
@@ -625,35 +627,47 @@
 
             for (let col = startCol; col <= endCol; col++) {
                 
-                // 第11排特殊處理：只有1~3號有位置
-                if (row === 11 && col > 3) {
+                if (vRow === 7) {
+                    // 視覺第 7 列完全留空，作為對應後門的「橫向走道」
                     html += `<td class="empty-seat"></td>`;
                 } else {
-                    const seatCode = `${row}-${col}`;
-                    const name = studentFilledData[seatCode];
-                    const isMySeat = (seatCode === myBookedSeat);
+                    // 實際的座位排數：1~6 列對應 1~6 排，8~12 列對應 7~11 排
+                    let seatRow = vRow < 7 ? vRow : vRow - 1;
                     
-                    let tdClass = "";
-                    let innerHTML = "";
-
-                    if (name) {
-                        tdClass = isMySeat ? "booked my-seat" : "booked";
-                        if (isVerifyVisualOn) { tdClass = officialRoster.includes(name) ? "verified-match" : "verified-error"; }
-                        let displayName = name;
-                        if (!isBackend && !isMySeat) { displayName = maskName(name); }
-                        innerHTML = `<span class="seat-num">${seatCode}</span><br><span class="seat-name">${displayName}</span>`;
+                    // 第11排特殊處理：只有1~3號有位置
+                    if (seatRow === 11 && col > 3) {
+                        html += `<td class="empty-seat"></td>`;
                     } else {
-                        innerHTML = `<span class="seat-num-empty">${seatCode}</span>`;
-                    }
+                        const seatCode = `${seatRow}-${col}`;
+                        const name = studentFilledData[seatCode];
+                        const isMySeat = (seatCode === myBookedSeat);
+                        
+                        let tdClass = "";
+                        let innerHTML = "";
 
-                    html += `<td class="${tdClass}" onclick="handleSeatClick('${seatCode}')">${innerHTML}</td>`;
+                        if (name) {
+                            tdClass = isMySeat ? "booked my-seat" : "booked";
+                            if (isVerifyVisualOn) { tdClass = officialRoster.includes(name) ? "verified-match" : "verified-error"; }
+                            let displayName = name;
+                            if (!isBackend && !isMySeat) { displayName = maskName(name); }
+                            innerHTML = `<span class="seat-num">${seatCode}</span><br><span class="seat-name">${displayName}</span>`;
+                        } else {
+                            innerHTML = `<span class="seat-num-empty">${seatCode}</span>`;
+                        }
+
+                        html += `<td class="${tdClass}" onclick="handleSeatClick('${seatCode}')">${innerHTML}</td>`;
+                    }
                 }
 
-                // 穿插走道：第 3, 6, 9 欄之後加走道 (僅當前區塊涵蓋該走道時渲染)
+                // 穿插垂直走道：第 3, 6, 9 欄之後加走道
                 if (col === 3 || col === 6 || col === 9) {
-                    // 若剛好是區塊的最後一欄(例如左側的第6欄)，則不必在最右邊畫走道，以求美觀
                     if (col !== endCol) {
-                        html += `<td class="aisle"></td>`;
+                        if (vRow === 7) {
+                            // 橫向與直向走道交會點，維持空白
+                            html += `<td class="empty-seat"></td>`;
+                        } else {
+                            html += `<td class="aisle"></td>`;
+                        }
                     }
                 }
             }
