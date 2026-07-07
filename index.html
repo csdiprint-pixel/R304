@@ -32,18 +32,20 @@
 
         .class-info-header { text-align: center; font-size: 27px; font-weight: bold; margin-bottom: 25px; color: #111; word-break: break-all; line-height: 1.4;}
 
-        .stage-area { position: relative; width: 100%; max-width: 800px; display: flex; justify-content: center; align-items: center; margin: 15px auto 40px auto; }
+        /* 講台位置調整 */
+        .stage-area { position: relative; width: 1530px; display: flex; justify-content: center; align-items: center; margin: 15px auto 40px auto; }
         .stage-box { border: 2px solid var(--border-color); padding: 15px 45px; font-size: 24px; font-weight: bold; background: #f2f2f2; border-radius: 4px; z-index: 1;}
 
         .classroom-grid { display: flex; justify-content: center; align-items: stretch; overflow-x: auto; padding-bottom: 30px; margin-top: 10px; }
 
-        /* 座位表格動態寬度，不寫死 */
+        /* 304 教室 1(門) + 12欄 + 3走道 寬度調整 */
         .seat-table { 
             border-collapse: separate; 
             border-spacing: 6px 8px; 
             table-layout: fixed; 
-            margin: 0 auto; 
-            width: max-content;
+            width: 1530px; 
+            min-width: 1530px; 
+            margin: 0; 
         }
         
         .seat-table td { 
@@ -65,6 +67,7 @@
             box-sizing: border-box;
         }
 
+        /* 獨立設定前後門的儲存格樣式 */
         .seat-table td.door-cell {
             width: 70px !important;
             min-width: 70px !important;
@@ -103,12 +106,15 @@
             background: transparent !important;
             box-shadow: none !important;
             cursor: default !important;
+            width: 112px !important;
+            min-width: 112px !important;
+            max-width: 112px !important;
         }
 
         .seat-table td.aisle {
-            width: 15px !important; 
-            min-width: 15px !important; 
-            max-width: 15px !important; 
+            width: 12px !important; 
+            min-width: 12px !important; 
+            max-width: 12px !important; 
             background-color: #e2e8f0;
             border: none !important; 
             cursor: default;
@@ -117,6 +123,7 @@
         }
 
         .scroll-hint { text-align: center; font-size: 20px; color: #e67e22; margin-bottom: 20px; font-weight: bold; }
+        @media (min-width: 1600px) { .scroll-hint { display: none; } }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 9999; }
         .modal-body { background: #fff; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
@@ -160,20 +167,37 @@
             .seat-table td { -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 16px; width: 80px; height: 60px;}
             .seat-table td.door-cell-active { font-size: 18px; writing-mode: vertical-lr; width: 40px !important; min-width: 40px !important; }
             .seat-table td.aisle { background: #e2e8f0 !important; border: none; }
+            .stage-area { width: 100% !important; display: flex !important; }
         }
 
         @media (max-width: 768px) {
-            .main-container { padding: 10px 4px !important; }
+            .scroll-hint { display: none !important; }
+
+            .seat-table {
+                width: 1530px !important;
+                min-width: 1530px !important;
+                table-layout: fixed !important;
+            }
+
+            .seat-table td:not(.aisle):not(.empty-seat):not(.door-cell) {
+                white-space: nowrap !important;
+            }
+
+            .classroom-grid, .stage-area {
+                width: 1530px !important;
+                margin: 0 auto !important;
+            }
+
+            /* 手機螢幕等比例縮放配適 (針對 1530px 寬度微調縮放係數) */
+            @media (max-width: 375px) { .classroom-grid, .stage-area { zoom: 0.20 !important; } }
+            @media (min-width: 376px) and (max-width: 414px) { .classroom-grid, .stage-area { zoom: 0.22 !important; } }
+            @media (min-width: 415px) and (max-width: 440px) { .classroom-grid, .stage-area { zoom: 0.25 !important; } }
+            @media (min-width: 441px) and (max-width: 768px) { .classroom-grid, .stage-area { zoom: 0.44 !important; } }
+
+            .main-container { padding: 10px 4px !important; overflow-x: auto !important; }
             .nav-bar { padding: 12px 8px !important; }
             .nav-bar span { font-size: 18px !important; }
             .nav-btn { font-size: 15px !important; padding: 6px 12px !important; }
-
-            .seat-table td { width: 88px !important; min-width: 88px !important; max-width: 88px !important; height: 68px !important; }
-            .seat-table td.door-cell { width: 35px !important; min-width: 35px !important; max-width: 35px !important; }
-            .seat-table td.door-cell-active { font-size: 18px !important; letter-spacing: 4px !important; }
-            
-            .seat-num, .seat-num-empty { font-size: 26px !important; font-weight: 900; line-height: 1; display: inline-block; margin-bottom: 2px; }
-            .seat-name { font-size: 17px !important; display: inline-block; }
 
             .modal-overlay { zoom: 1 !important; }
             .modal-body { width: 85% !important; max-width: 360px !important; padding: 20px !important; }
@@ -181,9 +205,13 @@
             #targetSeatLabel { font-size: 24px !important; }
             .modal-body input { font-size: 18px !important; padding: 8px !important; }
             .btn { font-size: 18px !important; padding: 8px !important; }
+
+            .seat-num, .seat-num-empty { font-size: 32px !important; font-weight: 900; line-height: 1; display: inline-block; margin-bottom: 2px; }
+            .seat-name { font-size: 20px !important; display: inline-block; }
             
+            /* 行動端大按鈕排版調整 */
             .block-btn-container { flex-direction: column; align-items: center; }
-            .block-btn-container button { width: 95% !important; height: 120px !important; margin-bottom: 15px; font-size: 26px !important; }
+            .block-btn-container button { width: 90% !important; height: 130px !important; margin-bottom: 15px; }
         }
     </style>
 </head>
@@ -196,13 +224,13 @@
 
     <div id="blockSelectionPage" class="page active">
         <div class="main-container" style="text-align: center; margin-top: 30px; padding-bottom: 50px;">
-            <h2 style="color: #2c3e50; font-size: 30px; margin-bottom: 40px;" id="blockSelectHeader">304教室 - 請選擇座位區塊</h2>
+            <h2 style="color: #2c3e50; font-size: 32px; margin-bottom: 40px;" id="blockSelectHeader">304教室 - 請選擇座位區塊</h2>
             <div class="block-btn-container" style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;">
-                <button class="btn-admin-act btn-blue" style="width: 320px; height: 160px; font-size: 32px; border-radius: 15px; border: 4px solid #1a5276;" onclick="selectBlock('left')">
-                    左側座位區<br><span style="font-size: 22px; color: #d6eaf8;">(1 ~ 6排)</span>
+                <button class="btn-admin-act btn-blue" style="width: 320px; height: 160px; font-size: 32px; border-radius: 15px; border: 4px solid #1a5276;" onclick="selectBlock('front')">
+                    前段座位區<br><span style="font-size: 22px; color: #d6eaf8;">(第 1 排 ~ 第 6 排)</span>
                 </button>
-                <button class="btn-admin-act btn-orange" style="width: 320px; height: 160px; font-size: 32px; border-radius: 15px; border: 4px solid #a04000;" onclick="selectBlock('right')">
-                    右側座位區<br><span style="font-size: 22px; color: #fdebd0;">(7 ~ 12排)</span>
+                <button class="btn-admin-act btn-orange" style="width: 320px; height: 160px; font-size: 32px; border-radius: 15px; border: 4px solid #a04000;" onclick="selectBlock('back')">
+                    後段座位區<br><span style="font-size: 22px; color: #fdebd0;">(第 7 排 ~ 第 12 排)</span>
                 </button>
                 <button id="adminShowAllBtn" class="btn-admin-act btn-green" style="display:none; width: 320px; height: 160px; font-size: 32px; border-radius: 15px; border: 4px solid #145a32;" onclick="selectBlock('all')">
                     全區顯示<br><span style="font-size: 22px; color: #d5f5e3;">(管理員核實專用)</span>
@@ -345,7 +373,7 @@
     const FIREBASE_URL = "https://csdi-seating-system-default-rtdb.asia-southeast1.firebasedatabase.app";
 
     let currentPage = "student"; 
-    let currentBlock = null;    // 紀錄目前選擇的區塊：'left', 'right', 'all'
+    let currentBlock = null;    // 紀錄目前選擇的區塊：'front', 'back', 'all'
     let activeSeatId = "";      
     let isVerifyVisualOn = false; 
 
@@ -375,6 +403,7 @@
         location.reload();
     }
 
+    // 區塊切換相關邏輯
     function showBlockSelection() {
         document.getElementById("blockSelectionPage").classList.add("active");
         document.getElementById("studentPage").classList.remove("active");
@@ -505,6 +534,7 @@
                 document.getElementById("adminAccountInput").focus();
             }
         } else {
+            // 從後台返回前台，顯示區塊選擇
             showBlockSelection();
         }
     }
@@ -584,7 +614,9 @@
         }
     }
 
-    // 核心渲染：加入後門水平走道 (第 7 視覺列)
+    // 🏆 精確繪製 304 教室座位 (分區動態生成)
+    // 總共 11 排，每排 12 欄，第 11 排只有 1-3
+    // 走道在第 3, 6, 9 欄之後
     function renderSeatsGrid() {
         if (!currentBlock && currentPage !== "admin") return;
 
@@ -595,80 +627,62 @@
         const myBookedSeat = localStorage.getItem(`mySeat_304_${currentClassID}`);
         const isBackend = (currentPage === "admin");
 
-        let startCol = 1;
-        let endCol = 12;
+        let startRow = 1;
+        let endRow = 11; // 總共有11排
 
-        if (currentBlock === 'left') { startCol = 1; endCol = 6; }
-        else if (currentBlock === 'right') { startCol = 7; endCol = 12; }
-        else if (currentBlock === 'all') { startCol = 1; endCol = 12; }
+        // 根據選擇區塊決定要顯示的列
+        if (currentBlock === 'front') { startRow = 1; endRow = 6; }
+        else if (currentBlock === 'back') { startRow = 7; endRow = 11; }
+        else if (currentBlock === 'all') { startRow = 1; endRow = 11; }
 
+        // 控制講台顯示與否
         const stageArea = document.getElementById("stageArea");
         if (stageArea) {
-            stageArea.style.display = "flex";
+            if (currentBlock === 'front' || currentBlock === 'all' || isBackend) {
+                stageArea.style.display = "flex";
+            } else {
+                stageArea.style.display = "none";
+            }
         }
 
-        // 原本 11 排座位 + 1 排橫向走道 = 總共 12 列的視覺空間
-        const MAX_VISUAL_ROWS = 12; 
+        const MAX_COLS = 12;
 
-        for (let vRow = 1; vRow <= MAX_VISUAL_ROWS; vRow++) {
+        for (let row = startRow; row <= endRow; row++) {
             html += "<tr>";
             
-            // 門僅在顯示左側(含第一欄)或全區時顯示
-            if (currentBlock === 'left' || currentBlock === 'all' || isBackend) {
-                if (vRow === 1) {
-                    html += `<td class="door-cell door-cell-active">前門</td>`;
-                } else if (vRow === 7) {
-                    // 第 7 列擺放後門
-                    html += `<td class="door-cell door-cell-active">後門</td>`;
-                } else {
-                    html += `<td class="door-cell"></td>`;
-                }
+            // 左側第一欄：獨立的「前後門」指示格
+            if (row === 1) {
+                html += `<td class="door-cell door-cell-active">前門</td>`;
+            } else if (row === 7) {
+                html += `<td class="door-cell door-cell-active">後門</td>`;
+            } else {
+                html += `<td class="door-cell"></td>`;
             }
-
-            for (let col = startCol; col <= endCol; col++) {
+            
+            for (let col = 1; col <= MAX_COLS; col++) {
                 
-                if (vRow === 7) {
-                    // 視覺第 7 列完全留空，作為對應後門的「橫向走道」
+                // 第 11 排特殊處理：只有 1, 2, 3 號
+                if (row === 11 && col > 3) {
                     html += `<td class="empty-seat"></td>`;
                 } else {
-                    // 實際的座位排數：1~6 列對應 1~6 排，8~12 列對應 7~11 排
-                    let seatRow = vRow < 7 ? vRow : vRow - 1;
+                    const seatCode = `${row}-${col}`;
+                    const name = studentFilledData[seatCode];
+                    const isMySeat = (seatCode === myBookedSeat);
                     
-                    // 第11排特殊處理：只有1~3號有位置
-                    if (seatRow === 11 && col > 3) {
-                        html += `<td class="empty-seat"></td>`;
+                    if (name) {
+                        let tdClass = isMySeat ? "booked my-seat" : "booked";
+                        if (isVerifyVisualOn) { tdClass = officialRoster.includes(name) ? "verified-match" : "verified-error"; }
+                        let displayName = name;
+                        if (!isBackend && !isMySeat) { displayName = maskName(name); }
+                        html += `<td class="${tdClass}" onclick="handleSeatClick('${seatCode}')"><span class="seat-num">${seatCode}</span><br><span class="seat-name">${displayName}</span></td>`;
                     } else {
-                        const seatCode = `${seatRow}-${col}`;
-                        const name = studentFilledData[seatCode];
-                        const isMySeat = (seatCode === myBookedSeat);
-                        
-                        let tdClass = "";
-                        let innerHTML = "";
-
-                        if (name) {
-                            tdClass = isMySeat ? "booked my-seat" : "booked";
-                            if (isVerifyVisualOn) { tdClass = officialRoster.includes(name) ? "verified-match" : "verified-error"; }
-                            let displayName = name;
-                            if (!isBackend && !isMySeat) { displayName = maskName(name); }
-                            innerHTML = `<span class="seat-num">${seatCode}</span><br><span class="seat-name">${displayName}</span>`;
-                        } else {
-                            innerHTML = `<span class="seat-num-empty">${seatCode}</span>`;
-                        }
-
-                        html += `<td class="${tdClass}" onclick="handleSeatClick('${seatCode}')">${innerHTML}</td>`;
+                        html += `<td onclick="handleSeatClick('${seatCode}')"><span class="seat-num-empty">${seatCode}</span></td>`;
                     }
                 }
 
-                // 穿插垂直走道：第 3, 6, 9 欄之後加走道
+                // 穿插走道：第 3, 6, 9 欄之後
                 if (col === 3 || col === 6 || col === 9) {
-                    if (col !== endCol) {
-                        if (vRow === 7) {
-                            // 橫向與直向走道交會點，維持空白
-                            html += `<td class="empty-seat"></td>`;
-                        } else {
-                            html += `<td class="aisle"></td>`;
-                        }
-                    }
+                    html += `<td class="aisle"></td>`;
                 }
             }
             html += "</tr>";
@@ -884,6 +898,7 @@
 
         if (!seatId || !studentName) { alert("請輸入座位編號與姓名！"); return; }
         
+        // 驗證 304 座位格式：1-11排，最多12欄
         if (!/^([1-9]|10|11)-([1-9]|10|11|12)$/.test(seatId)) { alert("座位格式錯誤 (正確為 1-1 到 11-12)！"); return; }
         const [r, c] = seatId.split('-').map(Number);
         if (r === 11 && c > 3) {
@@ -891,6 +906,7 @@
         }
 
         studentFilledData[seatId] = studentName;
+        // 如果目前正在前台視角且已選擇區塊，即時更新畫面
         if (currentBlock || currentPage === "admin") renderSeatsGrid();
         
         await updateCloudSeat(seatId, studentName);
@@ -957,17 +973,20 @@
     function exportCurrentClassSeats() {
         if (!currentClassID) { alert("目前沒有班期資料可供列印。"); return; }
         
+        // 為了確保印表機可以印出所有座位，暫時將區塊設為 all，並強迫顯示 studentPage
         const oldBlock = currentBlock;
         currentBlock = 'all';
         renderSeatsGrid();
         
         window.print();
         
+        // 列印後恢復原狀態
         currentBlock = oldBlock;
         if (currentBlock) renderSeatsGrid();
     }
 
     window.onload = async function() {
+        // 先決定是否顯示區塊選擇
         if (currentPage === "student" && !currentBlock) {
             showBlockSelection();
         }
